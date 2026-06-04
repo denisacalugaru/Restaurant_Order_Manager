@@ -1,6 +1,5 @@
 package service;
-
-import service.Comanda;
+import model.Comanda;
 
 public interface Promotie {
     double aplicaDiscount(Comanda comanda);

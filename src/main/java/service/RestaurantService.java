@@ -6,28 +6,27 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 public class RestaurantService implements Promotie {
 
-    private List<Masa> mese;
+    private Map<Integer, Masa> mese;
     private List<Rezervare> rezervari;
     private Meniu meniu;
+    private final AuditService auditService = AuditService.getInstance();
 
     public RestaurantService() {
-        this.mese = new ArrayList<>();
+        this.mese = new HashMap<>();
         this.rezervari = new ArrayList<>();
         this.meniu = new Meniu();
     }
 
-
     @Override
     public boolean esteInIntervalulPromotional() {
-        LocalTime acum = LocalTime.now();
-        return acum.isAfter(LocalTime.of(15, 59)) && acum.isBefore(LocalTime.of(18, 1));
+        return LocalTime.now().isAfter(LocalTime.of(15, 59)) && LocalTime.now().isBefore(LocalTime.of(18, 1));
     }
 
     @Override
     public double aplicaDiscount(Comanda comanda) {
+        auditService.scrieActiune("aplicaDiscount");
         double discountTotal = 0;
         if (esteInIntervalulPromotional()) {
             for (Produs p : comanda.getProduseComandate()) {
@@ -40,6 +39,7 @@ public class RestaurantService implements Promotie {
     }
 
     public double calculeazaNotaPlata(Comanda comanda) {
+        auditService.scrieActiune("calculeazaNotaPlata");
         double totalFaraDiscount = comanda.getProduseComandate().stream()
                 .mapToDouble(Produs::getPret)
                 .sum();
@@ -48,14 +48,24 @@ public class RestaurantService implements Promotie {
     }
 
     public void ocupaMasa(Masa masa) throws MasaOcupataException {
+        auditService.scrieActiune("ocupaMasa");
         if (masa.getStatus().equalsIgnoreCase("Ocupata")) {
             throw new MasaOcupataException("Masa " + masa.getNumar() + " este deja ocupata de altcineva!");
         }
         masa.setStatus("Ocupata");
     }
 
+    public void ocupaMasaCuOspatar(Masa masa, Angajat angajat) throws MasaOcupataException {
+        auditService.scrieActiune("alocareOspatarMasa");
+        if (masa.getStatus().equalsIgnoreCase("Ocupata")) {
+            throw new MasaOcupataException("Masa " + masa.getNumar() + " este deja ocupata de altcineva!");
+        }
+        masa.setStatus("Ocupata");
+        masa.setOspatar(angajat);
+    }
 
     public List<Bautura> getBauturiAlcoolice() {
+        auditService.scrieActiune("getBauturiAlcoolice");
         return meniu.getProduse().stream()
                 .filter(p -> p instanceof Bautura)
                 .map(p -> (Bautura) p)
@@ -64,14 +74,34 @@ public class RestaurantService implements Promotie {
     }
 
     public List<Rezervare> cautaRezervareDupaClient(String numeCautat) {
+        auditService.scrieActiune("cautaRezervareDupaClient");
         return rezervari.stream()
                 .filter(r -> r.getNumeClient().equalsIgnoreCase(numeCautat))
                 .collect(Collectors.toList());
     }
 
-    public Meniu getMeniu() { return meniu; }
+    public Meniu getMeniu() {
+        auditService.scrieActiune("getMeniu");
+        return meniu;
+    }
 
-    public void adaugaMasa(Masa m) { mese.add(m); }
+    public void adaugaMasa(Masa m) {
+        auditService.scrieActiune("adaugaMasa");
+        mese.put(m.getNumar(), m);
+    }
 
-    public void adaugaRezervare(Rezervare r) { rezervari.add(r); }
+    public Masa gasesteMasaDupaNumar(int numar) {
+        auditService.scrieActiune("gasesteMasaDupaNumar");
+        return mese.get(numar);
+    }
+
+    public void adaugaRezervare(Rezervare r) {
+        auditService.scrieActiune("adaugaRezervare");
+        rezervari.add(r);
+    }
+
+    public Collection<Masa> getMese() {
+        auditService.scrieActiune("getMese");
+        return mese.values();
+    }
 }

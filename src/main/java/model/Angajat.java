@@ -20,5 +20,8 @@ public class Angajat {
 
         return rol;
     }
+    public double getSalariu() {
+        return salariu;
+    }
 }
 

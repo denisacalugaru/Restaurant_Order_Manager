@@ -1,7 +1,5 @@
-package service;
+package model;
 
-import model.Masa;
-import model.Produs;
 import java.util.ArrayList;
 import java.util.List;
 

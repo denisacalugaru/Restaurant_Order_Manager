@@ -1,3 +1,4 @@
+//exceptie custom
 package exceptions;
 
 public class MasaOcupataException extends Exception {
