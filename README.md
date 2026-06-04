@@ -71,6 +71,10 @@ Produs, PreparatCulinar, Bautura, Ingredient, Categorie, Masa, Comanda, Rezervar
 
 ---
 
+## Diagrama ERD
+<img width="1049" height="594" alt="ERD" src="https://github.com/user-attachments/assets/8d85e639-23e6-4eec-8e45-a6531695018c" />
+
+
 ## Tehnologii folosite
 
 - Java 21
